@@ -1,27 +1,27 @@
-#import matplotlib.pyplot as plt
 import numpy as np
-#import pandas as pd
-#import seaborn as sns
 import tensorflow as tf
 
-num_vectors = 1000
-num_clusters = 3
-num_steps = 100
-vector_values = []
+def ReadImage(filename):
+    """ 
+    IN filenames: string - read file names
+    OUT (***int, int[3]) - image, size of image
+    """
+    filename_queue = tf.train.string_input_producer([filename])
+    reader = tf.WholeFileReader()
+    key, value = reader.read(filename_queue)
+    decode_img = tf.image.decode_png(value, channels=3)
 
-for i in range(num_vectors):
-  if np.random.random() > 0.5:
-    vector_values.append([np.random.normal(0.5, 0.6),
-                          np.random.normal(0.3, 0.9)])
-  else:
-    vector_values.append([np.random.normal(2.5, 0.4),
-                         np.random.normal(0.8, 0.5)])
+    init_op = tf.global_variables_initializer()
+    with tf.Session() as sess:
+        sess.run(init_op)
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(coord=coord)
 
-f = open("result.txt", "w")
-f.write("Data points\n");
-for i in range(num_vectors):
-  f.write("({}, {})\n".format(vector_values[i][0], vector_values[i][1]))
-f.close()
+        image = decode_img.eval()
+        coord.request_stop()
+        coord.join(threads)
 
+        shape = [len(image), len(image[0]), len(image[0][0])]
+        return (image, shape)
 
 
