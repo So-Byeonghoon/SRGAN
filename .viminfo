@@ -14,8 +14,8 @@
 $
 
 # Command Line History (newest to oldest):
-:wq
 :q
+:wq
 :Q
 :w
 :a
@@ -25,6 +25,7 @@ $
 :1000
 
 # Search String History (newest to oldest):
+?/a
 ?/xrange
 ?//
 ?/plt
@@ -36,9 +37,9 @@ $
 # Input Line History (newest to oldest):
 
 # Registers:
-"0	LINE	0
-	
-""1	LINE	0
+""0	LINE	0
+	f.close()
+"1	LINE	0
 	f.close()
 "2	LINE	0
 	f.close()
@@ -61,18 +62,20 @@ $
 
 # File marks:
 '0  1  0  ~/.gitignore
-'1  1  0  ~/read_image.py
-'2  1  0  ~/__pycache__/read_image.cpython-34.pyc
-'3  27  0  ~/read_image.py
-'4  18  42  ~/read_image.py
-'5  4  9  ~/read_image.py
-'6  25  28  ~/read_image.py
-'7  1  0  ~/.ssh/id_rsa.pub
-'8  4  0  ~/.gitignore
-'9  1  0  ~/.cache
+'1  1  0  ~/.giti
+'2  1  0  ~/.git
+'3  1  0  ~/read_image.py
+'4  1  0  ~/__pycache__/read_image.cpython-34.pyc
+'5  27  0  ~/read_image.py
+'6  18  42  ~/read_image.py
+'7  4  9  ~/read_image.py
+'8  25  28  ~/read_image.py
+'9  1  0  ~/.ssh/id_rsa.pub
 
 # Jumplist (newest first):
 -'  1  0  ~/.gitignore
+-'  1  0  ~/.giti
+-'  1  0  ~/.git
 -'  1  0  ~/read_image.py
 -'  1  0  ~/__pycache__/read_image.cpython-34.pyc
 -'  27  0  ~/read_image.py
@@ -167,19 +170,20 @@ $
 -'  1  0  ~/examples.desktop
 -'  240  0  ~/examples.desktop
 -'  1  0  ~/git/train.py
--'  1  0  ~/examples.desktop
--'  240  0  ~/examples.desktop
 
 # History of marks within files (newest to oldest):
 
 > ~/.gitignore
 	"	1	0
-	^	1	0
-	.	1	0
+	^	1	2
+	.	1	1
 	+	1	2
 	+	2	7
 	+	3	10
-	+	1	0
+	+	1	1
+
+> ~/.giti
+	"	1	0
 
 > ~/read_image.py
 	"	1	0
