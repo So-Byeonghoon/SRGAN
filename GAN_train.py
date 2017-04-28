@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import os.path
 import scipy.misc
@@ -19,15 +20,16 @@ def _summarize_progress(train_data, feature, label, gene_output, batch, suffix, 
 
     clipped = tf.maximum(tf.minimum(gene_output, 1.0), 0.0)
 
-    image   = tf.concat(2, [nearest, bicubic, clipped, label])
+    image   = tf.concat([nearest, bicubic, clipped, label], 2)
 
     image = image[0:max_samples,:,:,:]
-    image = tf.concat(0, [image[i,:,:,:] for i in range(max_samples)])
+    image = tf.concat([image[i,:,:,:] for i in range(max_samples)], 0)
     image = td.sess.run(image)
 
     filename = 'batch%06d_%s.png' % (batch, suffix)
     filename = os.path.join(FLAGS.train_dir, filename)
-    scipy.misc.toimage(image, cmin=0., cmax=1.).save(filename)
+    plt.imshow(image)
+    plt.savefig(filename)
     print("    Saved %s" % (filename,))
 
 def _save_checkpoint(train_data, batch):
@@ -63,7 +65,7 @@ def train_model(train_data):
     td = train_data
 
     #summaries = tf.merge_all_summaries()
-    td.sess.run(tf.initialize_all_variables())
+    td.sess.run(tf.global_variables_initializer())
 
     lrval       = FLAGS.learning_rate_start
     start_time  = time.time()
@@ -75,6 +77,7 @@ def train_model(train_data):
     # Cache test features and labels (they are small)
     test_feature, test_label = td.sess.run([td.test_features, td.test_labels])
 
+    #with tf.device('/gpu:0'):
     while not done:
         batch += 1
         gene_loss = disc_real_loss = disc_fake_loss = -1.234
@@ -87,15 +90,14 @@ def train_model(train_data):
         if batch % 10 == 0:
             # Show we are alive
             elapsed = int(time.time() - start_time)/60
-            print('Progress[%3d%%], ETA[%4dm], Batch [%4d], G_Loss[%3.3f], D_Real_Loss[%3.3f], D_Fake_Loss[%3.3f]' %
-                  (int(100*elapsed/FLAGS.train_time), FLAGS.train_time - elapsed,
-                   batch, gene_loss, disc_real_loss, disc_fake_loss))
+            print('Progress[%3d%%], Batch [%4d], G_Loss[%3.3f], D_Real_Loss[%3.3f], D_Fake_Loss[%3.3f]' %
+                  (int(100*elapsed/FLAGS.train_time), batch, gene_loss, disc_real_loss, disc_fake_loss))
 
-            # Finished?            
+            # Finished?
             current_progress = elapsed / FLAGS.train_time
             if current_progress >= 1.0:
                 done = True
-            
+
             # Update learning rate
             if batch % FLAGS.learning_rate_half_life == 0:
                 lrval *= .5
@@ -105,10 +107,11 @@ def train_model(train_data):
             feed_dict = {td.gene_minput: test_feature}
             gene_output = td.sess.run(td.gene_moutput, feed_dict=feed_dict)
             _summarize_progress(td, test_feature, test_label, gene_output, batch, 'out')
-            
+
         if batch % FLAGS.checkpoint_period == 0:
             # Save checkpoint
             _save_checkpoint(td, batch)
 
     _save_checkpoint(td, batch)
+    _summarize_progress(td, test_feature, test_label, gene_output, batch, "out_finish")
     print('Finished training!')

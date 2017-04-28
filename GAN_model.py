@@ -365,7 +365,7 @@ def _generator_model(sess, features, labels, channels):
     for ru in range(len(res_units)-1):
         nunits  = res_units[ru]
 
-        for j in range(2):
+        for j in range(3):
             model.add_residual_block(nunits, mapsize=mapsize)
 
         # Spatial upscale (see http://distill.pub/2016/deconv-checkerboard/)
@@ -441,14 +441,18 @@ def _downscale(images, K):
                               padding='SAME')
     return downscaled
 
+
+
 def create_generator_loss(disc_output, gene_output, features):
+    """ using sigmoid_cross_entropy """
+    
     # I.e. did we fool the discriminator?
     cross_entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits=disc_output, labels=tf.ones_like(disc_output))
     gene_ce_loss  = tf.reduce_mean(cross_entropy, name='gene_ce_loss')
 
     # I.e. does the result look like the feature?
     K = int(gene_output.get_shape()[1])//int(features.get_shape()[1])
-    assert K == 2 or K == 4 or K == 8    
+    assert K == 2 or K == 4 or K == 8
     downscaled = _downscale(gene_output, K)
     
     gene_l1_loss  = tf.reduce_mean(tf.abs(downscaled - features), name='gene_l1_loss')
@@ -457,6 +461,13 @@ def create_generator_loss(disc_output, gene_output, features):
                            FLAGS.gene_l1_factor * gene_l1_loss, name='gene_loss')
     
     return gene_loss
+
+
+def create_generator_loss_mse(gene_output, labels):
+    """ using Mean Square Error """
+    mse = tf.reduce_mean(tf.pow(labels-gene_output, 2))
+    return mse
+
 
 def create_discriminator_loss(disc_real_output, disc_fake_output):
     # I.e. did we correctly identify the input as real or not?
@@ -467,6 +478,14 @@ def create_discriminator_loss(disc_real_output, disc_fake_output):
     disc_fake_loss     = tf.reduce_mean(cross_entropy_fake, name='disc_fake_loss')
 
     return disc_real_loss, disc_fake_loss
+
+
+def create_discriminator_loss_opt(disc_fake_output):
+    adversarial_loss = -tf.log(disc_fake_output)
+    adversarial_loss = tf.reduce_mean(adversarial_loss)
+
+    return adversarial_loss
+
 
 def create_optimizers(gene_loss, gene_var_list,
                       disc_loss, disc_var_list):    
