@@ -1,7 +1,7 @@
-import matplotlib.pyplot as plt
-import numpy as np
+# import matplotlib.pyplot as plt
+# import numpy as np
 import os.path
-import scipy.misc
+# import scipy.misc
 import tensorflow as tf
 import time
 
@@ -24,12 +24,16 @@ def _summarize_progress(train_data, feature, label, gene_output, batch, suffix, 
 
     image = image[0:max_samples,:,:,:]
     image = tf.concat([image[i,:,:,:] for i in range(max_samples)], 0)
-    image = td.sess.run(image)
 
-    filename = 'batch%06d_%s.png' % (batch, suffix)
+    filename = 'batch%06d_%s.jpeg' % (batch, suffix)
     filename = os.path.join(FLAGS.train_dir, filename)
-    plt.imshow(image)
-    plt.savefig(filename)
+    enc = tf.image.encode_jpeg(tf.cast(image*255, tf.uint8))
+    fwrite = tf.write_file(filename, enc)
+
+    image = td.sess.run(fwrite)
+
+    # plt.imshow(image)
+    # plt.savefig(filename)
     print("    Saved %s" % (filename,))
 
 def _save_checkpoint(train_data, batch):
@@ -96,6 +100,8 @@ def train_model(train_data):
             # Finished?
             current_progress = elapsed / FLAGS.train_time
             if current_progress >= 1.0:
+                done = True
+            if batch >= FLAGS.train_max_iteration:
                 done = True
 
             # Update learning rate

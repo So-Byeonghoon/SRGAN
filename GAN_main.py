@@ -21,7 +21,7 @@ tf.app.flags.DEFINE_string('checkpoint_dir', 'checkpoint',
 tf.app.flags.DEFINE_integer('checkpoint_period', 10000,
                             "Number of batches in between checkpoints")
 
-tf.app.flags.DEFINE_string('dataset', '/home/bhso/images/Set5_LR/',
+tf.app.flags.DEFINE_string('dataset', '/home/bhso/SRGAN/images/Set/',
                            "Path to the dataset directory.")
 
 tf.app.flags.DEFINE_float('epsilon', 1e-8,
@@ -42,7 +42,7 @@ tf.app.flags.DEFINE_float('learning_rate_start', 0.00020,
 tf.app.flags.DEFINE_integer('learning_rate_half_life', 5000,
                             "Number of batches until learning rate is halved")
 
-tf.app.flags.DEFINE_bool('log_device_placement', True,
+tf.app.flags.DEFINE_bool('log_device_placement', False,
                          "Log the device where variables are placed.")
 
 tf.app.flags.DEFINE_integer('sample_size', 64,
@@ -57,11 +57,14 @@ tf.app.flags.DEFINE_integer('random_seed', 0,
 tf.app.flags.DEFINE_integer('test_vectors', 1,
                             """Number of features to use for testing""")
                             
-tf.app.flags.DEFINE_string('train_dir', '/home/bhso/trained/',
+tf.app.flags.DEFINE_string('train_dir', '/home/bhso/SRGAN/trained/',
                            "Output folder where training logs are dumped.")
 
 tf.app.flags.DEFINE_integer('train_time', 20,
                             "Time in minutes to train the model")
+
+tf.app.flags.DEFINE_integer('train_max_iteration', 300,
+                            "Maximun iteration to train the model")
 
 def prepare_dirs(delete_train_dir=False):
     # Create checkpoint dir (do not delete anything)

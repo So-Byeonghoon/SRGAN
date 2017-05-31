@@ -1,4 +1,6 @@
 .*
 images/
 tensorflow/
+trained/
+checkpoint/
 __*
