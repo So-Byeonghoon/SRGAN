@@ -4,3 +4,4 @@ tensorflow/
 trained/
 checkpoint/
 __*
+*.pyc
